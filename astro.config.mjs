@@ -45,7 +45,8 @@ export default defineConfig({
             wrap: false,
         },
     },
-    site: "https://art-theme.netlify.app/",
+    site: 'https://NataliaKamovnikova.github.io',
+    base: 'homepage',
     integrations: [
         tailwind({
             config: { path: "./tailwind.config.js" },
