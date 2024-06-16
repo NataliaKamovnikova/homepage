@@ -1,24 +1,22 @@
 ---
-import { published } from "@blog/utils";
-import Preview from "@blog/ui/Preview/Preview.astro";
-import Pagination from "@blog/components/Pagination.astro";
-import { pageSize, siteInfo } from "@blog/config";
-import BlogPage from "@blog/Layouts/BlogPage.astro";
+import config from "@/config/config.json";
+import Base from "@/layouts/Base.astro";
+import Pagination from "@/layouts/components/Pagination.astro";
+import Posts from "@/layouts/Posts.astro";
+import { getSinglePage } from "@/lib/contentParser.astro";
+import { sortByDate } from "@/lib/utils/sortFunctions";
 
-const allPosts = await published();
-
-const totalPage = Math.max(1, Math.ceil(allPosts.length / pageSize));
+const posts = await getSinglePage("posts");
+const sortedPosts = sortByDate(posts);
+const totalPages = Math.ceil(posts.length / config.settings.pagination);
+const currentPosts = sortedPosts.slice(0, config.settings.pagination);
 ---
 
-<BlogPage hero={siteInfo.hero} heroPosition={siteInfo.heroPosition}>
-    <main>
-        {
-            allPosts
-                .slice(0, pageSize)
-                .map((p, i) => (
-                    <Preview post={p} direction={i % 2 === 0 ? "left" : ""} />
-                ))
-        }
-        <Pagination currentPage="1" totalPage={totalPage} url="pages" />
-    </main>
-</BlogPage>
+<Base>
+  <section class="section">
+    <div class="container">
+      <Posts posts={currentPosts} className="mb-16" />
+      <Pagination currentPage={1} totalPages={totalPages} />
+    </div>
+  </section>
+</Base>

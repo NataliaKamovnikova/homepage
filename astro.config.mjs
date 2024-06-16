@@ -1,104 +1,56 @@
-import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
-import tailwind from "@astrojs/tailwind";
-import vue from "@astrojs/vue";
-import { astroImageTools } from "astro-imagetools";
-import robotsTxt from "astro-robots-txt";
-// import compress from "astro-compress";
-import path from "path";
-// import partytown from "@astrojs/partytown";
-import remarkSmartypants from "remark-smartypants";
-import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import remarkMath from 'remark-math'
-import rehypeMathjax from 'rehype-mathjax'
-
+import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
-import remarkParseVar from "./plugins/remark-parseVar.mjs";
-import remarkCode from "./plugins/remark-code.mjs";
-import remarkFlow from './plugins/remark-flow.mjs';
+import tailwind from "@astrojs/tailwind";
+import AutoImport from "astro-auto-import";
+import { defineConfig, squooshImageService } from "astro/config";
+import remarkCollapse from "remark-collapse";
+import remarkToc from "remark-toc";
+import config from "./src/config/config.json";
 
+// https://astro.build/config
 export default defineConfig({
-    markdown: {
-        gfm: true,
-        syntaxHighlight: "prism",
-        remarkPlugins: [
-            remarkMath,
-            remarkSmartypants,
-            remarkParseVar,
-            remarkFlow,
-            remarkCode,
-        ],
-        rehypePlugins: [
-            rehypeMathjax,
-            rehypeSlug,
-            [
-                rehypeAutolinkHeadings,
-                {
-                    behavior: "wrap",
-                },
-            ],
-        ],
-        shikiConfig: {
-            theme: "poimandres",
-            langs: [],
-            wrap: false,
+  site: config.site.base_url ? config.site.base_url : "http://enta.at",
+  base: config.site.base_path ? config.site.base_path : "/",
+  trailingSlash: config.site.trailing_slash ? "always" : "never",
+  image: {
+    service: squooshImageService(),
+  },
+  integrations: [
+    react(),
+    sitemap(),
+    tailwind({
+      config: {
+        applyBaseStyles: false,
+      },
+    }),
+    AutoImport({
+      imports: [
+        "@/shortcodes/Button",
+        "@/shortcodes/Accordion",
+        "@/shortcodes/Notice",
+        "@/shortcodes/Video",
+        "@/shortcodes/Youtube",
+        "@/shortcodes/Tabs",
+        "@/shortcodes/Tab",
+      ],
+    }),
+    mdx(),
+  ],
+  markdown: {
+    remarkPlugins: [
+      remarkToc,
+      [
+        remarkCollapse,
+        {
+          test: "Table of contents",
         },
-    },
-    site: 'https://NataliaKamovnikova.github.io',
-    base: 'homepage',
-    integrations: [
-        tailwind({
-            config: { path: "./tailwind.config.js" },
-            applyBaseStyles: false,
-        }),
-        // partytown(),
-        // compress({
-        //     html: false
-        // }),
-        robotsTxt(),
-        astroImageTools,
-        vue(),
-        mdx({
-            remarkPlugins: [
-                remarkMath,
-                remarkSmartypants,
-                remarkParseVar,
-                remarkFlow,
-                remarkCode,
-            ],
-            rehypePlugins: [
-                rehypeMathjax,
-                rehypeSlug,
-                [
-                    rehypeAutolinkHeadings,
-                    {
-                        behavior: "wrap",
-                    },
-                ],
-            ],
-            gfm: true,
-            syntaxHighlight: "prism",
-        }),
-        sitemap(),
+      ],
     ],
-    server: {
-        port: 3322,
+    shikiConfig: {
+      theme: "one-dark-pro",
+      wrap: true,
     },
-    vite: {
-        ssr: {
-            external: ["svgo"],
-        },
-        optimizeDeps: {
-            "exclude": ["mermaid"]
-        },
-        resolve: {
-            alias: {
-                "@root": path.resolve("./"),
-                "@blog": path.resolve("./src"),
-                "#": path.resolve("./typings"),
-            },
-        },
-        plugins: [],
-    },
+    extendDefaultPlugins: true,
+  },
 });
