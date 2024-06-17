@@ -1,8 +1,8 @@
 {
   "site": {
     "title": "Bookworm Light Astro | Blog Template",
-    "base_url": "https://bookworm-light-astro.vercel.app",
-    "base_path": "/",
+    "base_url": "https://NataliaKamovnikova.github.io",
+    "base_path": "/homepage",
     "trailing_slash": false,
     "favicon": "/images/favicon.png",
     "logo": "/images/logo.png",
